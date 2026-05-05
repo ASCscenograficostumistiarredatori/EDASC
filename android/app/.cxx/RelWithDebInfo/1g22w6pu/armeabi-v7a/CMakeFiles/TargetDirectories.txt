@@ -1,0 +1,2 @@
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/RelWithDebInfo/1g22w6pu/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/RelWithDebInfo/1g22w6pu/armeabi-v7a/CMakeFiles/rebuild_cache.dir

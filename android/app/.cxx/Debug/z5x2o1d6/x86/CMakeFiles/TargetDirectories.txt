@@ -1,0 +1,2 @@
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/Debug/z5x2o1d6/x86/CMakeFiles/edit_cache.dir
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/Debug/z5x2o1d6/x86/CMakeFiles/rebuild_cache.dir

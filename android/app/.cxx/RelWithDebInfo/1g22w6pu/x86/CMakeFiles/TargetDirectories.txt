@@ -1,0 +1,2 @@
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/RelWithDebInfo/1g22w6pu/x86/CMakeFiles/edit_cache.dir
+/Users/andreabuttarelli/Documents/GitHub/asc/asc/android/app/.cxx/RelWithDebInfo/1g22w6pu/x86/CMakeFiles/rebuild_cache.dir
