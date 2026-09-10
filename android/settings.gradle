@@ -23,7 +23,11 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "8.9.0" apply false
+    id "com.android.application" version "8.9.1" apply false
+    // Dichiarata qui e non solo nel buildscript di build.gradle: i moduli
+    // dei plugin risolvono la versione Kotlin da questo blocco, e senza
+    // mobile_scanner 7.x fallisce con un errore su compilerOptions.
+    id "org.jetbrains.kotlin.android" version "2.1.10" apply false
 }
 
 include ":app"

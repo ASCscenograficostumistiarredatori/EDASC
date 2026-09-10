@@ -42,7 +42,7 @@ dependencies:
   hydrated_bloc: ^9.1.5
   path_provider: ^2.1.2
   flutter_bloc: ^8.1.5
-  mobile_scanner: ^4.0.1
+  mobile_scanner: ^7.4.1
   equatable: ^2.0.5
   either_dart: ^1.0.0
   get_it: ^7.6.7

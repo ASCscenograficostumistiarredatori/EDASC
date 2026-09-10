@@ -15,6 +15,21 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // Alcuni plugin datati (es. easy_pdf_viewer) dichiarano un compileSdk vecchio
+    // e in release falliscono con "resource android:attr/lStar not found".
+    // Li allineiamo al compileSdk del progetto.
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (compileSdkVersion == null || compileSdkVersion.tokenize('-').last().toInteger() < 35) {
+                        compileSdkVersion 35
+                    }
+                }
+            }
+        }
+    }
 }
 
 rootProject.buildDir = '../build'
