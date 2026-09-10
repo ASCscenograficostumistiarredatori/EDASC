@@ -1,4 +1,5 @@
 import 'package:asc/src/core/global_blocs/first_time_cubit.dart';
+import 'package:asc/src/core/global_blocs/settings_cubit.dart';
 import 'package:asc/src/presentation/onboarding/onboarding_second.dart';
 import 'package:asc/src/theming/buttons.dart';
 import 'package:asc/src/theming/grid.dart';
@@ -13,12 +14,29 @@ class OnboardingConnector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/onboarding/bg.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
+          // Fondo scuro sempre presente: se l'immagine non è ancora decodificata
+          // (o non riesce a caricarsi) il testo bianco resta comunque leggibile.
+          const ColoredBox(color: Colors.black),
+          BlocBuilder<SettingsCubit, SettingsState>(
+            builder: (context, state) {
+              final introImage =
+                  state is SettingsLoaded ? state.introImage : null;
+              if (introImage == null) {
+                return const _BackgroundAsset();
+              }
+              return Image.network(
+                introImage,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                // Se l'immagine remota non arriva si ricade sull'asset locale.
+                errorBuilder: (context, error, stackTrace) =>
+                    const _BackgroundAsset(),
+              );
+            },
           ),
           SizedBox(
             width: double.infinity,
@@ -78,6 +96,22 @@ class OnboardingConnector extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BackgroundAsset extends StatelessWidget {
+  const _BackgroundAsset();
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/onboarding/bg.png',
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
     );
   }
 }

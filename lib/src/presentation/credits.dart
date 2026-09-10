@@ -1,4 +1,5 @@
 import 'package:asc/src/core/constants.dart';
+import 'package:asc/src/core/storage_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -22,11 +23,11 @@ class _CreditsPageState extends State<CreditsPage> {
 
   Future<void> load() async {
     try {
-      final res = await supabase
+      final res = normalizeSupabasePayload(await supabase
           .from('settings')
           .select('credits_page')
           .limit(1)
-          .single();
+          .single());
       content = res['credits_page'];
       isLoading = false;
     } catch (e) {

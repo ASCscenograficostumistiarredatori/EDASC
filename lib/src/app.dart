@@ -1,6 +1,7 @@
 import 'package:asc/src/core/constants.dart';
 import 'package:asc/src/core/dependency_initializer.dart';
 import 'package:asc/src/core/global_blocs/first_time_cubit.dart';
+import 'package:asc/src/core/global_blocs/settings_cubit.dart';
 import 'package:asc/src/di/di.dart';
 import 'package:asc/src/presentation/home/views/home.dart';
 import 'package:asc/src/presentation/onboarding/onboarding_start.dart';
@@ -8,7 +9,6 @@ import 'package:asc/src/presentation/splash/splash.dart';
 import 'package:asc/src/theming/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -36,19 +36,12 @@ class _AppState extends State<App> {
     await _splashDelay();
     await _dependenciesInitializer.init();
     initializeDependencies();
-    try {
-      final currentUserRes = await supabase.auth.getUser();
-      if (currentUserRes.user == null) {
-        await supabase.auth.signInAnonymously();
-      }
-    } catch (e) {
-      print(e);
-      try {
-        await supabase.auth.signInAnonymously();
-      } catch (e) {
-        print(e);
-      }
-    }
+    // Il login anonimo è disabilitato sul progetto Supabase in uso
+    // (`anonymous_provider_disabled`): tentarlo produrrebbe solo un errore a
+    // ogni avvio. I dati che servono all'app sono leggibili con la sola chiave
+    // pubblica, quindi non c'è nulla da autenticare.
+    // Se un domani si riattiva l'accesso anonimo, qui va rimessa la chiamata a
+    // supabase.auth.signInAnonymously().
     setState(() {
       isLoading = false;
     });
@@ -58,7 +51,7 @@ class _AppState extends State<App> {
         context,
       ),
       precacheImage(
-        const AssetImage('assets/onboarding/1.png'),
+        const AssetImage('assets/onboarding/bg.png'),
         context,
       ),
       precacheImage(
@@ -66,7 +59,11 @@ class _AppState extends State<App> {
         context,
       ),
       precacheImage(
-        const AssetImage('assets/onboarding/1.png'),
+        const AssetImage('assets/onboarding/2.png'),
+        context,
+      ),
+      precacheImage(
+        const AssetImage('assets/onboarding/3.png'),
         context,
       ),
     ]);
@@ -77,8 +74,15 @@ class _AppState extends State<App> {
     if (isLoading) {
       return const SplashConnector();
     }
-    return BlocProvider<FirstTimeCubit>(
-      create: (context) => FirstTimeCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<FirstTimeCubit>(
+          create: (context) => FirstTimeCubit(),
+        ),
+        BlocProvider<SettingsCubit>(
+          create: (context) => SettingsCubit()..init(),
+        ),
+      ],
       child: MaterialApp(
         title: 'ASC',
         theme: ThemeData(
@@ -92,13 +96,26 @@ class _AppState extends State<App> {
             backgroundColor: Colors.white,
           ),
         ),
-        home: BlocBuilder<FirstTimeCubit, bool>(
-          builder: (context, state) {
-            print('state: $state');
-            if (state) {
-              return const OnboardingConnector();
+        home: BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, settingsState) {
+            if (settingsState is SettingsLoading) {
+              return const SplashConnector();
             }
-            return const HomeConnector();
+            if (settingsState is SettingsError) {
+              return Scaffold(
+                body: Center(
+                  child: Text('Something went wrong:\n${settingsState.error}'),
+                ),
+              );
+            }
+            return BlocBuilder<FirstTimeCubit, bool>(
+              builder: (context, isFirstTime) {
+                if (isFirstTime) {
+                  return const OnboardingConnector();
+                }
+                return const HomeConnector();
+              },
+            );
           },
         ),
       ),

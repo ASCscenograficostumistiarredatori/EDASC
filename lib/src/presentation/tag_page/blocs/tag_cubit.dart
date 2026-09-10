@@ -9,8 +9,21 @@ class TagCubit extends Cubit<TagState> {
   final EntityRepository _entityRepository;
 
   void load(String id, Function(String) onError) {
-    _entityRepository.byTag(id).then((res) =>
-        res.fold((l) => onError(l.toString()), (r) => emit(TagLoaded(r))));
+    _entityRepository.byTag(id).then((res) => res.fold(
+          (l) => onError(l.toString()),
+          (r) {
+            final sorted = [...r]..sort((a, b) {
+                final byLastName = (a.lastName ?? '')
+                    .toLowerCase()
+                    .compareTo((b.lastName ?? '').toLowerCase());
+                if (byLastName != 0) return byLastName;
+                return a.firstName.toLowerCase().compareTo(
+                      b.firstName.toLowerCase(),
+                    );
+              });
+            emit(TagLoaded(sorted));
+          },
+        ));
   }
 }
 

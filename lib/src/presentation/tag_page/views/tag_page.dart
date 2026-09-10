@@ -1,3 +1,4 @@
+import 'package:asc/src/core/constants.dart';
 import 'package:asc/src/data/models/entity.dart';
 import 'package:asc/src/data/models/tag.dart';
 import 'package:asc/src/di/di.dart';
@@ -137,11 +138,17 @@ class _Item extends StatelessWidget {
           children: [
             ClipOval(
               child: CachedNetworkImage(
-                imageUrl: entity.profilePicture ?? '',
+                imageUrl:
+                    normalizeSupabaseStorageUrl(entity.profilePicture ?? ''),
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const Icon(
+                  Icons.person_outline,
+                  size: 32,
+                  color: Colors.black38,
+                ),
+                errorWidget: (context, url, error) => const Icon(
                   Icons.person_outline,
                   size: 32,
                   color: Colors.black38,

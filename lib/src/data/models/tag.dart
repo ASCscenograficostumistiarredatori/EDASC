@@ -16,12 +16,26 @@ class Tag {
   });
 
   static Tag fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String;
+    final name = json['name'] as String;
+    late String color;
+    try {
+      color = json['color'] as String;
+    } catch (e) {
+      color = '#000000';
+    }
+    late String? textColor;
+    try {
+      textColor = json['text_color'] as String?;
+    } catch (e) {
+      textColor = null;
+    }
     return Tag(
-      id: json['id'],
-      name: json['name'],
-      color: HexColor.fromHex((json['color'] as String).replaceAll('#', '')),
-      textColor: json['text_color'] != null
-          ? HexColor.fromHex((json['text_color'] as String).replaceAll('#', ''))
+      id: id,
+      name: name,
+      color: HexColor.fromHex(color.replaceAll('#', '').substring(0, 6)),
+      textColor: textColor != null
+          ? HexColor.fromHex(textColor.replaceAll('#', '').substring(0, 6))
           : null,
     );
   }

@@ -1,4 +1,5 @@
 import 'package:asc/src/core/constants.dart';
+import 'package:asc/src/core/storage_urls.dart';
 import 'package:asc/src/core/global_blocs/first_time_cubit.dart';
 import 'package:asc/src/data/models/entity.dart';
 import 'package:asc/src/data/models/tag.dart';
@@ -68,23 +69,26 @@ class _NewHomeWithTagsState extends State<_NewHomeWithTags> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     load();
   }
 
   Future<void> load() async {
     try {
-      final res = await supabase.from('tags').select();
+      final res =
+          normalizeSupabasePayload(await supabase.from('tags').select());
+      print(res);
       setState(() {
         tags = List<Tag>.from(res.map((e) => Tag.fromJson(e)));
         isLoading = false;
       });
       return;
-    } catch (e) {
+    } catch (e, s) {
       setState(() {
         error = e.toString();
       });
+      print(e);
+      print(s);
     } finally {
       setState(() {
         isLoading = false;
@@ -285,7 +289,8 @@ class _Drawer extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const EntityConnector(id: 'asc'),
+                    builder: (context) => const EntityConnector(
+                        id: 'associazione-italiana-scenografi-costumisti-arredatori'),
                   ),
                 ),
                 child: const TTitle('ASC'),

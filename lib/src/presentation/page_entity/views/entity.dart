@@ -1,7 +1,9 @@
+import 'package:asc/src/core/constants.dart';
 import 'package:asc/src/data/models/bibliography.dart';
 import 'package:asc/src/data/models/cinematic_work.dart';
 import 'package:asc/src/data/models/custom_folders.dart';
 import 'package:asc/src/data/models/exhibition.dart';
+import 'package:asc/src/data/models/interview.dart';
 import 'package:asc/src/data/models/magazine.dart';
 import 'package:asc/src/data/models/scene_photo.dart';
 import 'package:asc/src/data/models/set_photo.dart';
@@ -11,6 +13,7 @@ import 'package:asc/src/presentation/camera/camera.dart';
 import 'package:asc/src/presentation/magazine/views/magazine.dart';
 import 'package:asc/src/presentation/page_entity/blocs/entity_cubit.dart';
 import 'package:asc/src/presentation/page_entity/blocs/image_cubit.dart';
+import 'package:asc/src/presentation/page_entity/widgets/audio_player.dart';
 import 'package:asc/src/presentation/page_entity/widgets/map.dart';
 import 'package:asc/src/presentation/tag_page/views/tag_page.dart';
 import 'package:asc/src/theming/buttons.dart';
@@ -156,10 +159,16 @@ class _Body extends StatelessWidget {
                       Center(
                         child: ClipOval(
                           child: CachedNetworkImage(
-                            imageUrl: state.entity.profilePicture!,
+                            imageUrl: normalizeSupabaseStorageUrl(
+                                state.entity.profilePicture!),
                             width: 210,
                             height: 210,
                             fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.person_outline,
+                              size: 32,
+                              color: Colors.black38,
+                            ),
                           ),
                         ),
                       ),
@@ -249,6 +258,7 @@ class _Body extends StatelessWidget {
                     _SetPhoto(setPhotos: state.entity.setPhotos),
                     _ScenePhoto(scenePhotos: state.entity.scenePhotos),
                     _Sketches(sketches: state.entity.sketches),
+                    _Interviews(interviews: state.entity.interviews),
                     _CustomFolders(customFolders: state.entity.customFolders),
                     _Map(
                       pins: state.entity.pins,
@@ -307,10 +317,15 @@ class _Body extends StatelessWidget {
                     padding: const EdgeInsets.all(Grid.m),
                     child: Center(
                       child: CachedNetworkImage(
-                        imageUrl: state,
+                        imageUrl: normalizeSupabaseStorageUrl(state),
                         fit: BoxFit.contain,
                         height: double.infinity,
                         width: double.infinity,
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.image_outlined,
+                          size: 32,
+                          color: Colors.black38,
+                        ),
                       ),
                     ),
                   ),
@@ -459,7 +474,14 @@ class _Exhibition extends StatelessWidget {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: Grid.s),
-                      child: CachedNetworkImage(imageUrl: e.url!),
+                      child: CachedNetworkImage(
+                        imageUrl: normalizeSupabaseStorageUrl(e.url!),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.image_outlined,
+                          size: 32,
+                          color: Colors.black38,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -498,8 +520,16 @@ class _SetPhoto extends StatelessWidget {
                     context.read<ImageCubit>().focus(e.url);
                   },
                   child: Padding(
-                      padding: const EdgeInsets.only(bottom: Grid.s),
-                      child: CachedNetworkImage(imageUrl: e.url)),
+                    padding: const EdgeInsets.only(bottom: Grid.s),
+                    child: CachedNetworkImage(
+                      imageUrl: normalizeSupabaseStorageUrl(e.url),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.image_outlined,
+                        size: 32,
+                        color: Colors.black38,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -538,7 +568,14 @@ class _ScenePhoto extends StatelessWidget {
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: Grid.s),
-                    child: CachedNetworkImage(imageUrl: e.url),
+                    child: CachedNetworkImage(
+                      imageUrl: normalizeSupabaseStorageUrl(e.url),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.image_outlined,
+                        size: 32,
+                        color: Colors.black38,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -578,7 +615,14 @@ class _Sketches extends StatelessWidget {
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: Grid.s),
-                    child: CachedNetworkImage(imageUrl: e.url),
+                    child: CachedNetworkImage(
+                      imageUrl: normalizeSupabaseStorageUrl(e.url),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.image_outlined,
+                        size: 32,
+                        color: Colors.black38,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -586,6 +630,37 @@ class _Sketches extends StatelessWidget {
           const SizedBox.square(
             dimension: Grid.m,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Interviews extends StatelessWidget {
+  const _Interviews({required this.interviews});
+
+  final List<Interview> interviews;
+
+  @override
+  Widget build(BuildContext context) {
+    // Le righe senza file audio non devono generare il cassetto: se restano
+    // solo quelle, la sezione non ha nulla da mostrare.
+    final playable = interviews.where((e) => e.hasAudio).toList();
+    if (playable.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return ExpandableContainer(
+      title: 'Interviste',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox.square(dimension: Grid.m),
+          for (final e in playable)
+            InterviewAudioPlayer(
+              url: e.url!.trim(),
+              title: e.title,
+            ),
+          const SizedBox.square(dimension: Grid.m),
         ],
       ),
     );
@@ -673,8 +748,13 @@ class _Magazine extends StatelessWidget {
                 context.read<ImageCubit>().focus(magazine.imageUrl);
               },
               child: CachedNetworkImage(
-                imageUrl: magazine.imageUrl,
+                imageUrl: normalizeSupabaseStorageUrl(magazine.imageUrl),
                 height: 250,
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.image_outlined,
+                  size: 32,
+                  color: Colors.black38,
+                ),
               ),
             ),
           ),

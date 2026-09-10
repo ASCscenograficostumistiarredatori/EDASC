@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asc/src/core/constants.dart';
 import 'package:asc/src/theming/app_bar.dart';
 import 'package:asc/src/theming/grid.dart';
 import 'package:asc/src/theming/typography.dart';
@@ -65,7 +66,7 @@ class _MapSheetState extends State<MapSheet> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(Grid.m),
                       child: CachedNetworkImage(
-                        imageUrl: map['image'],
+                        imageUrl: normalizeSupabaseStorageUrl(map['image']),
                         width: double.infinity,
                         height: 200,
                         fit: BoxFit.cover,
@@ -101,7 +102,7 @@ class _MapSheetState extends State<MapSheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context, title: 'A spacco con...'),
+      appBar: appBar(context, title: 'A spasso con...'),
       body: Stack(
         children: [
           CustomGoogleMapMarkerBuilder(
@@ -206,7 +207,8 @@ class _MapSheetState extends State<MapSheet> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(Grid.m),
                                     child: CachedNetworkImage(
-                                      imageUrl: pin['image'],
+                                      imageUrl: normalizeSupabaseStorageUrl(
+                                          pin['image']),
                                       width: 200,
                                       height: 150,
                                       fit: BoxFit.cover,

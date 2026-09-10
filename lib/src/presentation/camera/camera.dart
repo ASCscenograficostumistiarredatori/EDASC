@@ -1,6 +1,8 @@
+import 'package:asc/src/core/storage_urls.dart';
 import 'package:asc/src/core/constants.dart';
 import 'package:asc/src/presentation/page_entity/views/entity.dart';
 import 'package:asc/src/theming/typography.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -19,6 +21,20 @@ class _CameraConnectorState extends State<CameraConnector> {
   @override
   void initState() {
     super.initState();
+
+    if (kDebugMode) {
+      Future.delayed(const Duration(seconds: 1)).then((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const EntityConnector(
+              id: 'associazione-italiana-scenografi-costumisti-arredatori',
+            ),
+          ),
+        );
+      });
+    }
+
     controller = MobileScannerController(autoStart: false);
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       controller.stop();
@@ -76,7 +92,7 @@ class _CameraConnectorState extends State<CameraConnector> {
                     }
                     if (value == null) return;
                     final uri = Uri.tryParse(value);
-                    final url = (await supabase
+                    final url = normalizeSupabasePayload(await supabase
                         .from('settings')
                         .select('url')
                         .limit(1)
