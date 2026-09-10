@@ -26,10 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>io.flutter.embedded_views_preview</key>
-	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission is required for QR Code scanning.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>EDASC App richiede la tua posizione per vedere elementi sulla mappa vicini a te.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone permission is required for camera access.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -41,17 +41,8 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>EDASC App richiede la tua posizione per vedere elementi sulla mappa vicini a te.</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
